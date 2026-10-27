@@ -11,7 +11,6 @@ def ask(messages):
 
 
 def zero_shot(question):
-    # Style 1: just ask directly, no examples
     return [
         {"role": "system", "content": "You are a helpful teacher."},
         {"role": "user", "content": question},
@@ -19,7 +18,6 @@ def zero_shot(question):
 
 
 def few_shot(question):
-    # Style 2: show examples first, so the AI copies the style
     return [
         {"role": "system", "content": "You are a helpful teacher. Answer in exactly 2 short lines."},
         {"role": "user", "content": "What is a variable in Python?"},
@@ -31,7 +29,6 @@ def few_shot(question):
 
 
 def chain_of_thought(question):
-    # Style 3: ask the AI to think step by step
     return [
         {"role": "system", "content": "You are a helpful teacher."},
         {"role": "user", "content": question + "\n\nThink step by step, then give the final answer."},
@@ -39,7 +36,6 @@ def chain_of_thought(question):
 
 
 def main():
-    # Get the question from the command line, or ask for it
     if len(sys.argv) > 1:
         question = " ".join(sys.argv[1:])
     else:
