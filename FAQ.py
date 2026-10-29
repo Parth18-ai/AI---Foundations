@@ -8,10 +8,6 @@ Run:
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-# ---------------------------------------------------------------
-# STEP 1: Our FAQ questions (this is our "document list")
-# Rule: every line ends with a comma, and nothing goes after the ]
-# ---------------------------------------------------------------
 faqs = [
     "How do I reset my password?",
     "How can I change my email address?",
@@ -36,49 +32,30 @@ faqs = [
     "How do I connect to the office Wi-Fi?",
 ]
 
-# ---------------------------------------------------------------
-# STEP 2: Load the embedding model (the "teacher" who gives marks)
-# The first run downloads it (~90 MB). After that it works offline.
-# ---------------------------------------------------------------
+
 print("Loading model...")
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# ---------------------------------------------------------------
-# STEP 3: Embed all FAQs ONCE and keep them in memory.
-# normalize_embeddings=True makes every arrow length 1.
-# When arrows have length 1, cosine similarity = simple dot product.
-# Result shape: (number of FAQs, 384)
-# ---------------------------------------------------------------
+
 faq_embeddings = model.encode(faqs, normalize_embeddings=True)
 print(f"Embedded {len(faqs)} FAQs. Shape: {faq_embeddings.shape}")
 
 
-# ---------------------------------------------------------------
-# STEP 4: The search function
-# ---------------------------------------------------------------
 def search(question, top_k=3):
     """Return the top_k most similar FAQs for the given question."""
 
-    # a) Turn the question into numbers (same model, same settings!)
     question_embedding = model.encode(question, normalize_embeddings=True)
 
-    # b) Compare the question with ALL FAQs at once (one score each)
     scores = faq_embeddings @ question_embedding
 
-    # c) Positions of the highest scores.
-    #    argsort sorts low -> high, so [::-1] flips it to high -> low.
     best_positions = np.argsort(scores)[::-1][:top_k]
 
-    # d) Build a clean result list
     results = []
     for pos in best_positions:
         results.append((faqs[pos], float(scores[pos])))
     return results
 
 
-# ---------------------------------------------------------------
-# STEP 5: Let the user type questions
-# ---------------------------------------------------------------
 if __name__ == "__main__":
     print("\nAsk me anything! (type 'quit' to stop)\n")
 
